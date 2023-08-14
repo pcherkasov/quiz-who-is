@@ -1,0 +1,11 @@
+app = "quizyeasy-ui"
+primary_region = "waw"
+
+[[services]]
+  internal_port = 3000
+  protocol = "tcp"
+  auto_stop_machines = true
+  auto_start_machines = true
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80

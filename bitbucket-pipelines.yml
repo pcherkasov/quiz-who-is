@@ -1,0 +1,15 @@
+image: multiarch/ubuntu-core:x86_64-xenial
+clone:
+  depth: full
+
+pipelines:
+  branches:
+    main:
+    - step:
+        name: deploy
+        script:
+          - apt-get -y update; apt-get -y install curl
+          - curl -L https://fly.io/install.sh | sh
+          - export FLYCTL_INSTALL="/root/.fly"
+          - export PATH="$FLYCTL_INSTALL/bin:$PATH"
+#          - flyctl deploy
