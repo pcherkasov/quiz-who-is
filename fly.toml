@@ -2,7 +2,7 @@ app = "quizyeasy-ui"
 primary_region = "waw"
 
 [build]
-
+  image = "your-dockerhub-username/your-image-name:tag"
 [[services]]
   protocol = "tcp"
   internal_port = 3000
@@ -12,3 +12,7 @@ primary_region = "waw"
   [[services.ports]]
     port = 80
     handlers = ["http"]
+
+  [[args]]
+    name = "REACT_APP_BASE_URL"
+    value = "http://quizyeasy-api.internal/api/v1"

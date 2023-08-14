@@ -1,6 +1,9 @@
 # Build stage
 FROM node:lts-alpine AS build
+ARG REACT_APP_BASE_URL
 
+# Устанавливаем REACT_APP_BACKEND_URL как переменную окружения
+ENV REACT_APP_BASE_URL=${REACT_APP_BASE_URL}
 WORKDIR /app
 
 # Only copy the package.json and package-lock.json initially
