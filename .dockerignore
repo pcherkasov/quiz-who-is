@@ -1,0 +1,20 @@
+# .dockerignore
+
+# Git
+.git
+.gitignore
+
+# NodeJS
+node_modules
+npm-debug.log
+
+# Local environment variables
+.env.local
+
+# Development tools
+.vscode
+.idea
+
+# Operating System Files
+.DS_Store
+Thumbs.db
