@@ -3,9 +3,14 @@ FROM node:lts-alpine AS build
 
 WORKDIR /app
 
+# Only copy the package.json and package-lock.json initially
 COPY package*.json ./
+
 RUN npm ci --only=production
+
+# Then copy everything else
 COPY . .
+
 RUN npm run build
 
 # Runtime stage
