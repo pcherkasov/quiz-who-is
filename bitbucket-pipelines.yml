@@ -9,6 +9,7 @@ pipelines:
         name: deploy
         script:
           - apt-get -y update; apt-get -y install curl
+          - apt-get -y update; apt-get -y install docker
           - curl -L https://fly.io/install.sh | sh
           - export FLYCTL_INSTALL="/root/.fly"
           - export PATH="$FLYCTL_INSTALL/bin:$PATH"
