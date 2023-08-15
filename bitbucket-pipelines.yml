@@ -1,22 +1,43 @@
-image: docker:24.0.5-alpine3.18
+image: atlassian/default-image:3
 clone:
   depth: full
 
 pipelines:
   branches:
     main:
-    - step:
-        name: deploy
-        script:
-          - apk update; apk add curl
-          - curl -L https://fly.io/install.sh | sh
-          - export FLYCTL_INSTALL="/root/.fly"
-          - export PATH="$FLYCTL_INSTALL/bin:$PATH"
-          # Аутентификация для доступа к fly.io секретам
-          - echo $FLY_API_TOKEN > /root/.fly/api_token
-          # Передаем URL backend'a как аргумент сборки к Docker
-          - docker build --build-arg REACT_APP_BASE_URL=$REACT_APP_BASE_URL -t quizyeasy-ui .
-          # Пушим образ в Docker Hub
-          - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-          - docker push charkasau/quizyeasy-ui
-          - flyctl deploy
+      - step:
+          name: Build and Test
+          script:
+            - IMAGE_NAME=quizyeasy-ui
+            - docker build --build-arg REACT_APP_BASE_URL=$REACT_APP_BASE_URL -t quizyeasy-ui .
+            - docker save quizyeasy-ui --output "quizyeasy-ui.tar"
+          services:
+            - docker
+          caches:
+            - docker
+          artifacts:
+            - "*.tar"
+      - step:
+          name: Deploy to Production
+          deployment: Production
+          script:
+            - echo ${DOCKER_PASSWORD} | docker login --username "$DOCKER_USERNAME" --password-stdin
+            - IMAGE_NAME=quizyeasy-ui
+            - docker load --input "quizyeasy-ui.tar"
+            - VERSION="latest"
+            - IMAGE=charkasau/${IMAGE_NAME}
+            - docker tag "${IMAGE_NAME}" "${IMAGE}:${VERSION}"
+            - docker push "${IMAGE}:${VERSION}"
+          services:
+            - docker
+      - step:
+          name: deploy
+          script:
+            - apk update; apk add curl
+            - curl -L https://fly.io/install.sh | sh
+            - export FLYCTL_INSTALL="/root/.fly"
+            - export PATH="$FLYCTL_INSTALL/bin:$PATH"
+            # Аутентификация для доступа к fly.io секретам
+            - echo $FLY_API_TOKEN > /root/.fly/api_token
+            - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+            - flyctl deploy
