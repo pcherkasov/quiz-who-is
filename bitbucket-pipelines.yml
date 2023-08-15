@@ -1,4 +1,4 @@
-image: docker
+image: docker:24.0.5-alpine3.18
 clone:
   depth: full
 
