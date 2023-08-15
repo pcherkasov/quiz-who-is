@@ -8,8 +8,8 @@ pipelines:
     - step:
         name: deploy
         script:
-          - apk -y update; apk -y install curl
-          - apk -y update; apk -y install docker
+          - apk update; apk install curl
+          - apk update; apk install docker
           - curl -L https://fly.io/install.sh | sh
           - export FLYCTL_INSTALL="/root/.fly"
           - export PATH="$FLYCTL_INSTALL/bin:$PATH"
