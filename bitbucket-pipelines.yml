@@ -14,8 +14,6 @@ pipelines:
           - export PATH="$FLYCTL_INSTALL/bin:$PATH"
           # Аутентификация для доступа к fly.io секретам
           - echo $FLY_API_TOKEN > /root/.fly/api_token
-          # Извлечение URL backend'a
-          - REACT_APP_BASE_URL=$(flyctl secrets get REACT_APP_BASE_URL)
           # Передаем URL backend'a как аргумент сборки к Docker
           - docker build --build-arg REACT_APP_BASE_URL=$REACT_APP_BASE_URL -t quizyeasy-ui .
           # Пушим образ в Docker Hub
