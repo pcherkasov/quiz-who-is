@@ -6,28 +6,12 @@ pipelines:
   branches:
     main:
       - step:
-          name: Build and Test
-          script:
-            - IMAGE_NAME=quizyeasy-ui
-            - docker build --build-arg REACT_APP_BASE_URL=$REACT_APP_BASE_URL -t quizyeasy-ui .
-            - docker save quizyeasy-ui --output "quizyeasy-ui.tar"
-          services:
-            - docker
-          caches:
-            - docker
-          artifacts:
-            - "*.tar"
-      - step:
           name: Deploy to Production
           deployment: Production
           script:
+            - docker build --build-arg REACT_APP_BASE_URL=$REACT_APP_BASE_URL -t quizyeasy-ui .
             - echo ${DOCKER_PASSWORD} | docker login --username "$DOCKER_USERNAME" --password-stdin
-            - IMAGE_NAME=quizyeasy-ui
-            - docker load --input "quizyeasy-ui.tar"
-            - VERSION="latest"
-            - IMAGE=charkasau/${IMAGE_NAME}
-            - docker tag "${IMAGE_NAME}" "${IMAGE}:${VERSION}"
-            - docker push "${IMAGE}:${VERSION}"
+            - docker push charkasau/quizyeasy-ui
           services:
             - docker
       - step:
