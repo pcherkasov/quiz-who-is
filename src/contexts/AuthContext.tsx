@@ -31,7 +31,7 @@ export function AuthProvider ({ children }: AuthProviderProps) {
   const navigate = useNavigate();
 
   const [isAuthenticated, setAuthentication] = useState<boolean>(false);
-  const [fullName, setFullName] = useState<string>('');
+  const [fullName, setFullName] = useState<string>(localStorage.getItem("fullName") || '');
 
   authSignedInContextState = {
     isAuthenticated: isAuthenticated,

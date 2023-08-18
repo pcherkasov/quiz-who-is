@@ -1,10 +1,12 @@
 import {useRoutes, useParams, Navigate} from 'react-router-dom';
-import {lazy, ReactElement, ReactNode, Suspense, useState} from 'react';
+import React, {lazy, ReactElement, ReactNode, Suspense, useState} from 'react';
 import { useAuth } from '../hooks/useAuth';
+import {QueryClient, QueryClientProvider} from 'react-query';
 
+const queryClient = new QueryClient();
 const AuthRoutes = lazy(() => import('./auth/AuthRoutes'));
 const HomePage = lazy(() => import('../pages/HomePage'));
-// const OrganisationsPage = lazy(() => import('../pages/OrganisationsPage'));
+const OrganisationsPage = lazy(() => import('../pages/OrganisationsPage'));
 // const OrganisationPage = lazy(() => import('../pages/OrganisationPage'));
 // const TeamPage = lazy(() => import('../pages/TeamPage'));
 // const SeasonPage = lazy(() => import('../pages/SeasonPage'));
@@ -30,8 +32,12 @@ export default function RoutesIndex() {
 
   let element = useRoutes([
     { path: '/auth/*', element: <AuthRoutes /> },
-    { path: '/', element: isAuthenticated ? <ProtectedComponent><HomePage /></ProtectedComponent> : <Navigate to="/auth/signin" /> },
-    // { path: '/organisations', element: isAuthenticated ? <ProtectedComponent><OrganisationsPage /></ProtectedComponent> : /* RedirectToSomePage */ },
+    { path: '/', element: isAuthenticated
+        ? <ProtectedComponent><HomePage /></ProtectedComponent>
+        : <Navigate to="/auth/signin" /> },
+    { path: '/organisations', element: isAuthenticated
+        ? <ProtectedComponent><OrganisationsPage /></ProtectedComponent>
+        : <Navigate to="/auth/signin" /> },
     // { path: '/organisations/:orgId', element: isAuthenticated ? <ProtectedComponent><OrganisationPage /></ProtectedComponent> : /* RedirectToSomePage */ },
     // { path: '/organisations/:orgId/teams/:teamId', element: isAuthenticated ? <ProtectedComponent><TeamPage /></ProtectedComponent> : /* RedirectToSomePage */ },
     // { path: '/organisations/:orgId/seasons/:seasonId', element: isAuthenticated ? <ProtectedComponent><SeasonPage /></ProtectedComponent> : /* RedirectToSomePage */ },
@@ -40,8 +46,10 @@ export default function RoutesIndex() {
   ]);
 
   return (
+      <QueryClientProvider client={queryClient}>
     <Suspense fallback={<div>Loading...</div>}>
       {element}
     </Suspense>
+      </QueryClientProvider>
   );
 }

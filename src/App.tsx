@@ -7,14 +7,24 @@ import Footer from './components/layout/Footer';
 import {AuthProvider} from './contexts/AuthContext';
 
 const App: React.FC = () => {
+  const bodyStyle = {
+    minHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column' as 'column',
+    justifyContent: 'space-between',
+  };
+
   return (
     <Router>
       <AuthProvider>
-        <Header />
-        <RoutesIndex />
-        <Footer />
+        <div style={bodyStyle}>
+          <Header/>
+            <RoutesIndex/>
+          <Footer/>
+        </div>
       </AuthProvider>
     </Router>
+
   );
 }
 

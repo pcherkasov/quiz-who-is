@@ -1,6 +1,6 @@
 import api, { signin as apiSignin, signup as apiSignup, refreshToken as apiRefreshToken } from "./api";
 import CookieService from "./CookieService";
-import {NewUserRequestBody, SigninRequestBody, TokenRequestBody} from "../types/apiTypes";
+import {NewUserRequestBody, SigninRequestBody} from "../types/apiTypes";
 
 class AuthService {
   navigateCallback = (path: string) => {};
@@ -21,9 +21,10 @@ class AuthService {
   async signin(user: SigninRequestBody, navigate: Function, setFullName: (fullName: string) => void) {
     const response = await apiSignin(user);
     if(response.status === 200) {
-      this.setSession(response.data.accessToken, response.data.refreshToken);
+      this.setSession(response.data.accessToken, response.data.refreshToken, response.data.fullName);
       setFullName(response.data.fullName);
-      navigate('/');
+      localStorage.setItem("fullName", response.data.fullName);
+      navigate('/organisations');
       return true;
     } else {
       navigate('/auth/signup');
@@ -39,25 +40,26 @@ class AuthService {
   async refreshAuthToken(refreshToken: string) {
     const response = await apiRefreshToken({refreshToken});
     if (response.status === 200) {
-      this.setSession(response.data.accessToken, response.data.refreshToken);
+      this.setSession(response.data.accessToken, response.data.refreshToken, response.data.fullName);
       if(this.navigateCallback) {
-        this.navigateCallback('/'); // navigate to main page after refreshing the token
+        this.navigateCallback('/organisations'); // navigate to main page after refreshing the token
       }
       return response;
     } else {
-      this.removeSession();
       throw new Error('Token refresh failed');
     }
   }
 
-  setSession(accessToken: string, refreshToken: string) {
+  setSession(accessToken: string, refreshToken: string, fullName: string) {
     CookieService.setCookie("accessToken", accessToken, 1);
     CookieService.setCookie("refreshToken", refreshToken, 1);
+    localStorage.setItem("fullName", fullName);
   }
 
   removeSession() {
     CookieService.deleteCookie("accessToken");
     CookieService.deleteCookie("refreshToken");
+    localStorage.removeItem("fullName");
   }
 }
 
