@@ -15,7 +15,7 @@ const OrganisationListItem: React.FC<OrganisationListItemProps> = ({ organisatio
         <Typography variant="h5">{organisation.name}</Typography>
         <Typography variant="body2" color="text.secondary">{organisation.description}</Typography>
         <Stack direction="row" spacing={2} marginTop={2}>
-          <Button variant="contained" color="primary" onClick={() => onEdit(organisation.id)}>Edit</Button>
+          <Button variant="contained" color="secondary" onClick={() => onEdit(organisation.id)}>Edit</Button>
           <Button variant="contained" color="error" onClick={() => onDelete(organisation.id)}>Delete</Button>
         </Stack>
       </CardContent>

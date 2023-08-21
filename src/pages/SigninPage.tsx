@@ -23,13 +23,13 @@ const SigninPage: React.FC = () => {
         const response = await AuthService.signin(user, navigate, authContext.setFullName);
         if (response) {
           authContext?.setAuthentication(true);
-          setError(null); // clear error if sign in was successful
+          setError(null);
         }
       } else {
         throw new Error("AuthContext is undefined");
       }
     } catch (error) {
-      setError("Invalid credentials"); // set error message
+      setError("Invalid credentials");
     }
   };
 
@@ -42,7 +42,6 @@ const SigninPage: React.FC = () => {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          height: '100vh',
           p: 1,
         }}
       >

@@ -1,12 +1,19 @@
 import React, {useState} from 'react';
-import {useMutation, useQuery, useQueryClient, QueryFunction} from 'react-query';
-import {createOrganisation, deleteOrganisation, getOrganisation, getOrganisations, updateOrganisation} from '../services/api';
+import {QueryFunction, useMutation, useQuery, useQueryClient} from 'react-query';
+import {
+  createOrganisation,
+  deleteOrganisation,
+  getOrganisation,
+  getOrganisations,
+  updateOrganisation
+} from '../services/api';
 import OrganisationListItem from '../components/organisations/OrganisationListItem';
-import CreateOrganisationForm from '../components/organisations/CreateOrganisationForm';
-import {CreateOrganisationRequest, OrganisationInfoResponse, UpdateOrganisationRequest, Page} from '../types/apiTypes';
-import {Button, Container, Box, Typography, Stack} from '@mui/material';
+import CreateOrganisationDialog from '../components/organisations/CreateOrganisationDialog';
+import {CreateOrganisationRequest, OrganisationInfoResponse, Page, UpdateOrganisationRequest} from '../types/apiTypes';
+import {Button, Container, Stack, Typography} from '@mui/material';
+import UpdateOrganisationDialog from "../components/organisations/UpdateOrganisationDialog";
 
-const fetchOrganisations: QueryFunction<Page<OrganisationInfoResponse>, [string, number]> = async ({ queryKey }) => {
+const fetchOrganisations: QueryFunction<Page<OrganisationInfoResponse>, [string, number]> = async ({queryKey}) => {
   const [_key, page] = queryKey;
   return getOrganisations(page);
 };
@@ -14,6 +21,8 @@ const OrganisationPage: React.FC = () => {
   const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
   const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(0);
+  const [orgEditOpen, setOrgEditOpen] = useState(false);
+  const [orgCreateOpen, setOrgCreateOpen] = useState(false);
 
   const {
     data: organisations,
@@ -65,13 +74,24 @@ const OrganisationPage: React.FC = () => {
     return <div>Error occurred</div>;
   }
 
+  const handleUpdate = async (data: UpdateOrganisationRequest) => {
+    try {
+      await orgUpdateMutation.mutateAsync(data);
+      setOrgEditOpen(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleEdit = (id: number) => {
     setSelectedOrgId(id);
+    setOrgEditOpen(true);
   };
 
   const handleCreate = async (data: CreateOrganisationRequest) => {
     try {
       await orgCreateMutation.mutateAsync(data);
+      setOrgCreateOpen(false);
     } catch (error) {
       console.error(error);
     }
@@ -88,6 +108,14 @@ const OrganisationPage: React.FC = () => {
   return (
     <Container sx={{marginTop: '2em'}}>
       <Typography variant="h2" gutterBottom>Organisations</Typography>
+      <Button
+        variant="outlined"
+        color="primary"
+        onClick={() => setOrgCreateOpen(true)}
+        sx={{marginTop: '2em'}}
+      >
+        Add Organisation
+      </Button>
       <Stack direction="row" justifyContent="left" spacing={2} marginTop='2em'>
         {organisations?.content && organisations?.content.map((org: OrganisationInfoResponse) => (
           <OrganisationListItem
@@ -102,10 +130,17 @@ const OrganisationPage: React.FC = () => {
         {!organisations?.first && <Button onClick={handlePrevPage}>Previous page</Button>}
         {!organisations?.last && <Button onClick={handleNextPage}>Next page</Button>}
       </Stack>
-      <Box marginTop='2em'>
-        <Typography variant="h4" gutterBottom>Create a new organisation</Typography>
-        <CreateOrganisationForm onSubmit={handleCreate}/>
-      </Box>
+      <CreateOrganisationDialog
+        onSubmit={handleCreate}
+        open={orgCreateOpen}
+        onClose={() => setOrgCreateOpen(false)}
+      />
+      <UpdateOrganisationDialog
+        organisation={selectedOrganisation!}
+        onUpdate={handleUpdate}
+        open={orgEditOpen}
+        onClose={() => setOrgEditOpen(false)}
+      />
     </Container>
   );
 };
