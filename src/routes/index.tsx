@@ -10,6 +10,7 @@ const OrganisationsPage = lazy(() => import('../pages/OrganisationsPage'));
 const SeasonsPage = lazy(() => import('../pages/SeasonsPage'));
 const TeamsPage = lazy(() => import('../pages/TeamsPage'));
 const GamesPage = lazy(() => import('../pages/GamesPage'));
+const GamePage = lazy(() => import('../pages/GamePage'));
 // const OrganisationPage = lazy(() => import('../pages/OrganisationPage'));
 // const RoundPage = lazy(() => import('../pages/RoundPage'));
 
@@ -30,6 +31,7 @@ export default function RoutesIndex() {
     { path: '/organisations/:orgId/seasons', element: <ProtectedRoute><SeasonsPage /></ProtectedRoute> },
     { path: '/organisations/:orgId/teams', element: <ProtectedRoute><TeamsPage /></ProtectedRoute> },
     { path: '/organisations/:orgId/seasons/:seasonId/games', element: <ProtectedRoute><GamesPage /></ProtectedRoute> },
+    { path: '/organisations/:orgId/seasons/:seasonId/games/:gameId', element: <ProtectedRoute><GamePage /></ProtectedRoute> },
     // { path: '/organisations/:orgId/seasons/:seasonId', element: <ProtectedRoute><SeasonPage /></ProtectedRoute> },
     // { path: '/organisations/:orgId/seasons/:seasonId/games/:gameId/rounds/:roundId', element: <ProtectedRoute><RoundPage /></ProtectedRoute> },
   ]);

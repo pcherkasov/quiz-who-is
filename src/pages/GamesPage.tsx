@@ -1,11 +1,11 @@
 import {useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "react-query";
 import React, {useState} from 'react';
-import {createGame, deleteGame, getGame, getGames, updateGame,} from "../services/api";
-import {CreateGameRequest, GameResponse, UpdateGameInfoRequest} from "../types/apiTypes";
+import {createGame, deleteGame, getGame, getGames, updateGame, updateGameStatus,} from "../services/api";
+import {CreateGameRequest, GameResponse, UpdateGameInfoRequest, UpdateGameStatusRequest} from "../types/apiTypes";
 import {
-  Button,
-  Paper,
+  Button, MenuItem,
+  Paper, Select,
   Stack,
   Table,
   TableBody,
@@ -40,14 +40,14 @@ const GamesPage: React.FC = () => {
     isError: gameError
   } = useQuery(['games', currentPage, orgId, seasonId], fetchGames);
 
-  // const {
-  //   data: selectedGame,
-  //   isLoading: selectedGameLoading,
-  //   isError: selectedGameError
-  // } = useQuery(['game', selectedGameId, seasonId, orgId],
-  //   () => getGame(Number(orgId), Number(seasonId), Number(selectedGameId)), {
-  //     enabled: !!selectedGameId,
-  //   });
+  const gameStatusMutation = useMutation(
+    ({id, status}: UpdateGameStatusRequest) => updateGameStatus(Number(orgId), Number(seasonId), {id, status}),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(["games", currentPage, orgId, seasonId]);
+      },
+    }
+  );
 
   const gameCreateMutation = useMutation(
     ({seasonId, orgId, data}: {
@@ -171,16 +171,28 @@ const GamesPage: React.FC = () => {
                             cursor: "pointer",
                             transition: "all 0.2s ease",
                             '&:hover': {
-                              boxShadow: "0px 0px 10px 1px rgba(0, 0, 0, 0.2)",
+                              boxShadow: "0px 0px 10px 10px rgba(0, 0, 0, 0.2)",
                             }
                           }}
                           onClick={() => handleClick(game.id)}
                 >
                   <TableCell>{game.name}</TableCell>
                   <TableCell>{game.teams.length}</TableCell>
-                  <TableCell>{game.startedAt}</TableCell>
-                  <TableCell>{game.finishedAt}</TableCell>
-                  <TableCell>{game.status}</TableCell>
+                  <TableCell>{game.startedAt ? game.startedAt : 'Not Started'}</TableCell>
+                  <TableCell>{game.finishedAt ? game.finishedAt : 'Not Finished'}</TableCell>
+                  <TableCell>
+                    <Select
+                      value={game.status}
+                      onChange={(event) => {
+                        const status = event.target.value as string;
+                        gameStatusMutation.mutate({id: game.id, status})
+                      }}
+                    >
+                      <MenuItem value={"PENDING"}>Pending</MenuItem>
+                      <MenuItem value={"STARTED"}>Started</MenuItem>
+                      <MenuItem value={"FINISHED"}>Finished</MenuItem>
+                    </Select>
+                  </TableCell>
                   <TableCell>{game.description}</TableCell>
                   <TableCell sx={{borderLeftColor: 'gray', borderLeftStyle: 'solid'}}>
                     <Button variant="contained" color="info"
