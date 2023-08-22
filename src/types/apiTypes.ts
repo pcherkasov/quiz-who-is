@@ -115,6 +115,11 @@ export type UpdateSeasonRequest = {
   description: string;
 }
 
+export type UpdateSeasonStatusRequest = {
+  id: number;
+  status: string;
+}
+
 
 //Teams
 export type CreateTeamRequest = {
@@ -136,6 +141,35 @@ export type UpdateTeamRequest = {
 
 
 //Games
+export type CreateGameRequest = {
+  name: string;
+  description: string;
+  roundsNumber: number;
+  gameIds: number[];
+}
+
+export type GameResponse = {
+  id: number;
+  name: string;
+  description: string;
+  status: string;
+  startedAt: string;
+  finishedAt: string;
+  teams: TeamResponse[]
+}
+
+export type UpdateGameInfoRequest = {
+  id: number;
+  name: string;
+  description: string;
+  teams: number[]
+}
+
+export type UpdateGameStatusRequest = {
+  id: number;
+  status: string;
+}
+
 export type GameInfoResponse = {
   id: number;
   name: string;
@@ -144,4 +178,35 @@ export type GameInfoResponse = {
   status: string;
   startedAt: string;
   finishedAt: string;
+}
+
+export type TeamRoundResultResponse = {
+  roundId: number;
+  roundName: string;
+  roundPointsSum: number;
+  answers: AnswerInfoResponse[];
+}
+
+export type TeamGameResultResponse = {
+  teamId: number;
+  teamName: string;
+  place: number;
+  gamePointsSum: number;
+  roundResults:  { [key: string]: TeamRoundResultResponse };
+}
+
+export type GameResultsResponse = {
+  id: number;
+  name: string;
+  description: string;
+  teams: TeamGameResultResponse[];
+}
+
+//Answers
+export type AnswerInfoResponse = {
+  id: number;
+  questionId: number;
+  answerType: string;
+  cost: number;
+  isBomb: boolean;
 }

@@ -29,7 +29,7 @@ const TeamsPage: React.FC = () => {
 
   const queryClient = useQueryClient();
   const fetchTeams = async () => {
-    return getTeams(currentPage, Number(orgId));
+    return getTeams(currentPage, 7, Number(orgId));
   }
 
   const {

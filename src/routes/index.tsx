@@ -1,5 +1,5 @@
-import {useRoutes, useParams, Navigate} from 'react-router-dom';
-import React, {lazy, ReactElement, ReactNode, Suspense, useState} from 'react';
+import {useRoutes, Navigate} from 'react-router-dom';
+import React, {lazy, ReactElement, ReactNode, Suspense} from 'react';
 import { useAuth } from '../hooks/useAuth';
 import {QueryClient, QueryClientProvider} from 'react-query';
 
@@ -9,51 +9,36 @@ const HomePage = lazy(() => import('../pages/HomePage'));
 const OrganisationsPage = lazy(() => import('../pages/OrganisationsPage'));
 const SeasonsPage = lazy(() => import('../pages/SeasonsPage'));
 const TeamsPage = lazy(() => import('../pages/TeamsPage'));
+const GamesPage = lazy(() => import('../pages/GamesPage'));
 // const OrganisationPage = lazy(() => import('../pages/OrganisationPage'));
-// const GamePage = lazy(() => import('../pages/GamePage'));
 // const RoundPage = lazy(() => import('../pages/RoundPage'));
 
 interface ProtectedComponentProps {
   children: ReactNode;
 }
 
-const ProtectedComponent: React.FC<ProtectedComponentProps> = ({ children }): ReactElement | null => {
+const ProtectedRoute: React.FC<ProtectedComponentProps> = ({ children }) => {
   const { isAuthenticated } = useAuth();
-
-  if (isAuthenticated) {
-    return <>{children}</>;
-  }
-
-  return <Navigate to="/auth/signin" />;
+  return isAuthenticated ? <>{children}</> : <Navigate to="/auth/signin" />;
 };
 
 export default function RoutesIndex() {
-  let { isAuthenticated } = useAuth();
-
-  let element = useRoutes([
+  const routes = useRoutes([
     { path: '/auth/*', element: <AuthRoutes /> },
-    { path: '/', element: isAuthenticated
-        ? <ProtectedComponent><HomePage /></ProtectedComponent>
-        : <Navigate to="/auth/signin" /> },
-    { path: '/organisations', element: isAuthenticated
-        ? <ProtectedComponent><OrganisationsPage /></ProtectedComponent>
-        : <Navigate to="/auth/signin" /> },
-    { path: '/organisations/:orgId/seasons', element: isAuthenticated
-        ? <ProtectedComponent><SeasonsPage /></ProtectedComponent>
-        : <Navigate to="/auth/signin" /> },
-    { path: '/organisations/:orgId/teams', element: isAuthenticated
-        ? <ProtectedComponent><TeamsPage /></ProtectedComponent>
-        : <Navigate to="/auth/signin" /> },
-    // { path: '/organisations/:orgId/seasons/:seasonId', element: isAuthenticated ? <ProtectedComponent><SeasonPage /></ProtectedComponent> : /* RedirectToSomePage */ },
-    // { path: '/organisations/:orgId/seasons/:seasonId/games/:gameId', element: isAuthenticated ? <ProtectedComponent><GamePage /></ProtectedComponent> : /* RedirectToSomePage */ },
-    // { path: '/organisations/:orgId/seasons/:seasonId/games/:gameId/rounds/:roundId', element: isAuthenticated ? <ProtectedComponent><RoundPage /></ProtectedComponent> : /* RedirectToSomePage */ },
+    { path: '/', element: <ProtectedRoute><HomePage /></ProtectedRoute> },
+    { path: '/organisations', element: <ProtectedRoute><OrganisationsPage /></ProtectedRoute> },
+    { path: '/organisations/:orgId/seasons', element: <ProtectedRoute><SeasonsPage /></ProtectedRoute> },
+    { path: '/organisations/:orgId/teams', element: <ProtectedRoute><TeamsPage /></ProtectedRoute> },
+    { path: '/organisations/:orgId/seasons/:seasonId/games', element: <ProtectedRoute><GamesPage /></ProtectedRoute> },
+    // { path: '/organisations/:orgId/seasons/:seasonId', element: <ProtectedRoute><SeasonPage /></ProtectedRoute> },
+    // { path: '/organisations/:orgId/seasons/:seasonId/games/:gameId/rounds/:roundId', element: <ProtectedRoute><RoundPage /></ProtectedRoute> },
   ]);
 
   return (
-      <QueryClientProvider client={queryClient}>
-    <Suspense fallback={<div>Loading...</div>}>
-      {element}
-    </Suspense>
-      </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <Suspense fallback={<div>Loading...</div>}>
+        {routes}
+      </Suspense>
+    </QueryClientProvider>
   );
 }

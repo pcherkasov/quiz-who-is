@@ -1,21 +1,27 @@
 import axios from "axios";
 import {
+  CreateGameRequest,
   CreateOrganisationRequest,
+  CreateSeasonRequest,
+  CreateTeamRequest,
+  GameResponse,
+  GameResultsResponse,
   NewUserRequestBody,
   OrganisationInfoResponse,
-  SigninRequestBody,
-  TokenRequestBody,
-  TokenResponseBody,
-  UpdateOrganisationRequest,
-  UserResponseBody,
   Page,
   SeasonInfoResponse,
   SeasonResponse,
-  CreateSeasonRequest,
-  UpdateSeasonRequest,
+  SigninRequestBody,
   TeamResponse,
-  CreateTeamRequest,
-  UpdateTeamRequest
+  TokenRequestBody,
+  TokenResponseBody,
+  UpdateGameInfoRequest,
+  UpdateGameStatusRequest,
+  UpdateOrganisationRequest,
+  UpdateSeasonRequest,
+  UpdateSeasonStatusRequest,
+  UpdateTeamRequest,
+  UserResponseBody
 } from "../types/apiTypes";
 import CookieService from "./CookieService";
 import TokenRefreshService from "./TokenRefreshService";
@@ -28,6 +34,8 @@ function getEnv(varName: string, defaultValue: string): string {
   return process.env[varName] || defaultValue;
 }
 
+
+//=======================---Auth---=======================
 export const signup = (user: NewUserRequestBody) => {
   return api.post<UserResponseBody>('/auth/signup?lang=ru', user);
 };
@@ -41,9 +49,10 @@ export const refreshToken = (token: TokenRequestBody) => {
 };
 
 
-// Organisations
+//=======================---Organisations---=======================
 export const getOrganisations = async (page: number) => {
-  const response = await api.get<Page<OrganisationInfoResponse>>('/organisations?page=' + page + '&size=' + 3);
+  const response = await api.get<Page<OrganisationInfoResponse>>(
+    '/organisations?page=' + page + '&size=' + 7);
   return response.data;
 };
 export const getOrganisation = async (id: number | null) => {
@@ -51,44 +60,50 @@ export const getOrganisation = async (id: number | null) => {
   if (!id) {
     return;
   }
-  const response = await api.get<OrganisationInfoResponse>('/organisations/' + id);
+  const response = await api.get<OrganisationInfoResponse>(
+    '/organisations/' + id);
   return response.data;
 };
 export const createOrganisation = async (organisation: CreateOrganisationRequest) => {
 
-  const response = await api.post<OrganisationInfoResponse>('/organisations', organisation);
+  const response = await api.post<OrganisationInfoResponse>(
+    '/organisations',
+    organisation);
   return response.data;
 };
 export const updateOrganisation = async (organisation: UpdateOrganisationRequest) => {
 
-  const response = await api.put<OrganisationInfoResponse>('/organisations/' + organisation.id, organisation);
+  const response = await api.put<OrganisationInfoResponse>(
+    '/organisations/' + organisation.id,
+    organisation);
   return response.data;
 };
 export const deleteOrganisation = async (id: number | null) => {
 
   if (!id) {
-    return ;
+    return;
   }
-  const response = await api.delete<void>('/organisations/' + id);
+  const response = await api.delete<void>(
+    '/organisations/' + id);
   return response.data;
 };
 
 
-// Seasons
+//=======================---Seasons---=======================
 export const getSeasons = async (page: number, orgId: number) => {
   const response = await api.get<Page<SeasonInfoResponse>>(
-    '/organisations/' + orgId + '/seasons?page=' + page + '&size=' + 3);
+    `/organisations/${orgId}/seasons?page=${page}&size=${7}`);
   return response.data;
 };
 export const getSeason = async (orgId: number, seasonId: number) => {
   const response = await api.get<SeasonResponse>(
-    '/organisations/' + orgId + '/seasons/' + seasonId);
+    `/organisations/${orgId}/seasons/${seasonId}`);
   return response.data;
 };
 export const createSeason = async (orgId: number, season: CreateSeasonRequest) => {
 
   const response = await api.post<SeasonInfoResponse>(
-    '/organisations/' + orgId + '/seasons',
+    `/organisations/${orgId}/seasons`,
     season
   );
   return response.data;
@@ -96,23 +111,31 @@ export const createSeason = async (orgId: number, season: CreateSeasonRequest) =
 export const updateSeason = async (orgId: number, season: UpdateSeasonRequest) => {
 
   const response = await api.put<SeasonInfoResponse>(
-    '/organisations/' + orgId + '/seasons/' + season.id,
+    `/organisations/${orgId}/seasons/${season.id}`,
+    season
+  );
+  return response.data;
+};
+export const updateSeasonStatus = async (orgId: number, season: UpdateSeasonStatusRequest) => {
+
+  const response = await api.put<SeasonInfoResponse>(
+    `/organisations/${orgId}/seasons/${season.id}/status`,
     season
   );
   return response.data;
 };
 export const deleteSeason = async (orgId: number, seasonId: number) => {
   const response = await api.delete<void>(
-    '/organisations/' + orgId + '/seasons/' + seasonId
+    `/organisations/${orgId}/seasons/${seasonId}`
   );
   return response.data;
 };
 
 
-// Teams
-export const getTeams = async (page: number, orgId: number) => {
+//=======================---Teams---=======================
+export const getTeams = async (page: number, size: number, orgId: number) => {
   const response = await api.get<Page<TeamResponse>>(
-    '/organisations/' + orgId + '/teams?page=' + page + '&size=' + 3);
+    '/organisations/' + orgId + '/teams?page=' + page + '&size=' + size);
   return response.data;
 };
 export const getTeam = async (orgId: number, teamId: number) => {
@@ -121,7 +144,6 @@ export const getTeam = async (orgId: number, teamId: number) => {
   return response.data;
 };
 export const createTeam = async (orgId: number, team: CreateTeamRequest) => {
-
   const response = await api.post<TeamResponse>(
     '/organisations/' + orgId + '/teams',
     team
@@ -129,7 +151,6 @@ export const createTeam = async (orgId: number, team: CreateTeamRequest) => {
   return response.data;
 };
 export const updateTeam = async (orgId: number, team: UpdateTeamRequest) => {
-
   const response = await api.put<TeamResponse>(
     '/organisations/' + orgId + '/teams/' + team.id,
     team
@@ -143,8 +164,50 @@ export const deleteTeam = async (orgId: number, teamId: number) => {
   return response.data;
 };
 
+//=======================---Games---=======================
+export const getGames = async (page: number, orgId: number, seasonId: number) => {
+  const response = await api.get<Page<GameResponse>>(
+    `/organisations/${orgId}/seasons/${seasonId}/games?page=${page}&size=${7}`);
+  return response.data;
+};
+export const getGame = async (orgId: number, seasonId: number, gameId: number) => {
+  const response = await api.get<GameResultsResponse>(
+    `/organisations/${orgId}/seasons/${seasonId}/games/${gameId}`);
+  return response.data;
+};
+export const createGame = async (orgId: number, seasonId: number, game: CreateGameRequest) => {
 
-// Interceptors
+  const response = await api.post<GameResponse>(
+    `/organisations/${orgId}/seasons/${seasonId}/games`,
+    game
+  );
+  return response.data;
+};
+export const updateGame = async (orgId: number, seasonId: number, game: UpdateGameInfoRequest) => {
+
+  const response = await api.put<GameResponse>(
+    `/organisations/${orgId}/seasons/${seasonId}/games/${game.id}`,
+    game
+  );
+  return response.data;
+};
+export const updateGameStatus = async (orgId: number, seasonId: number, game: UpdateGameStatusRequest) => {
+
+  const response = await api.put<GameResponse>(
+    `/organisations/${orgId}/seasons/${seasonId}/games/${game.id}/status`,
+    game
+  );
+  return response.data;
+};
+export const deleteGame = async (orgId: number, seasonId: number, gameId: number) => {
+  const response = await api.delete<void>(
+    `/organisations/${orgId}/seasons/${seasonId}/games/${gameId}`
+  );
+  return response.data;
+};
+
+
+//=======================---Interceptors---=======================
 let isRefreshing = false;
 api.interceptors.response.use((response) => {
   return response;

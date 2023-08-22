@@ -30,7 +30,6 @@ const SeasonsPage: React.FC = () => {
   const queryClient = useQueryClient();
   const fetchSeasons = async () => {
     return getSeasons(currentPage, Number(orgId));
-
   }
 
   const {
@@ -43,7 +42,8 @@ const SeasonsPage: React.FC = () => {
     data: selectedSeason,
     isLoading: selectedSeasonLoading,
     isError: selectedSeasonError
-  } = useQuery(['season', selectedSeasonId, orgId], () => getSeason(Number(orgId), Number(selectedSeasonId)),{
+  } = useQuery(['season', selectedSeasonId, orgId],
+    () => getSeason(Number(orgId), Number(selectedSeasonId)),{
     enabled: !!selectedSeasonId,
   });
   const handlePrevPage = () => {
@@ -59,9 +59,7 @@ const SeasonsPage: React.FC = () => {
     event.stopPropagation();
     setSelectedSeasonId(seasonId);
     setSelectedOrgId(orgId);
-
     setSeasonEditOpen(true);
-
   };
 
   const seasonCreateMutation = useMutation(
@@ -121,7 +119,7 @@ const SeasonsPage: React.FC = () => {
 
   };
   const handleClick = (seasonId: number) => {
-    navigate(`/organisations/${orgId}/seasons/${seasonId}`);
+    navigate(`/organisations/${orgId}/seasons/${seasonId}/games`);
   };
 
   if (seasonLoading || selectedSeasonLoading) {
