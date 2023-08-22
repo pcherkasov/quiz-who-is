@@ -1,4 +1,4 @@
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "react-query";
 import {CreateSeasonRequest, SeasonInfoResponse, UpdateSeasonRequest} from "../types/apiTypes";
 import {createSeason, deleteSeason, getSeason, getSeasons, updateSeason} from "../services/api";
@@ -20,15 +20,17 @@ import UpdateSeasonDialog from "../components/seasons/UpdateSeasonDialog";
 
 const SeasonsPage: React.FC = () => {
   const {orgId} = useParams<{ orgId: string }>();
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
   const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
   const [seasonEditOpen, setSeasonEditOpen] = useState(false);
   const [seasonCreateOpen, setSeasonCreateOpen] = useState(false);
-  const queryClient = useQueryClient();
 
+  const queryClient = useQueryClient();
   const fetchSeasons = async () => {
     return getSeasons(currentPage, Number(orgId));
+
   }
 
   const {
@@ -44,19 +46,20 @@ const SeasonsPage: React.FC = () => {
   } = useQuery(['season', selectedSeasonId, orgId], () => getSeason(Number(orgId), Number(selectedSeasonId)),{
     enabled: !!selectedSeasonId,
   });
-
   const handlePrevPage = () => {
     setCurrentPage(old => Math.max(0, old - 1));
   };
   const handleNextPage = () => {
     if (seasons && seasons.totalPages - 1 > currentPage) {
       setCurrentPage(old => old + 1);
-    }
 
+    }
   };
-  const handleEdit = (orgId: number, seasonId: number) => {
+  const handleEdit = (event: React.MouseEvent<HTMLButtonElement>, orgId: number, seasonId: number) => {
+    event.stopPropagation();
     setSelectedSeasonId(seasonId);
     setSelectedOrgId(orgId);
+
     setSeasonEditOpen(true);
 
   };
@@ -80,7 +83,6 @@ const SeasonsPage: React.FC = () => {
         queryClient.invalidateQueries('seasons');
       },
     });
-
   const seasonDeleteMutation = useMutation(
     ({orgId, seasonId}: {
       orgId: number,
@@ -92,30 +94,34 @@ const SeasonsPage: React.FC = () => {
       },
     });
   const handleCreate = async (orgId: number, data: CreateSeasonRequest) => {
+
     try {
       await seasonCreateMutation.mutateAsync({orgId, data});
       setSeasonCreateOpen(false);
     } catch (error) {
       console.error(error);
     }
-
   };
   const handleUpdate = async (orgId: number, data: UpdateSeasonRequest) => {
+
     try {
       await seasonUpdateMutation.mutateAsync({orgId, data});
       setSeasonEditOpen(false);
     } catch (error) {
       console.error(error);
     }
-
   };
-  const handleDelete = async (orgId: number, seasonId: number) => {
+  const handleDelete = async (event: React.MouseEvent<HTMLButtonElement>, orgId: number, seasonId: number) => {
+    event.stopPropagation();
     try {
       await seasonDeleteMutation.mutateAsync({orgId, seasonId});
     } catch (error) {
       console.error(error);
     }
 
+  };
+  const handleClick = (seasonId: number) => {
+    navigate(`/organisations/${orgId}/seasons/${seasonId}`);
   };
 
   if (seasonLoading || selectedSeasonLoading) {
@@ -126,8 +132,14 @@ const SeasonsPage: React.FC = () => {
     return <div>Error occurred</div>;
   }
 
+  const goToTeams = () => {
+    navigate(`/organisations/${orgId}/teams`);
+  };
+
   return (
     <div>
+      <Button variant="contained" color="secondary" onClick={goToTeams}>Teams</Button>
+
       <Typography variant="h2" gutterBottom>Seasons</Typography>
       <Button
         variant="outlined"
@@ -147,13 +159,15 @@ const SeasonsPage: React.FC = () => {
               <TableCell style={{backgroundColor: '#f2f2f2', fontWeight: 'bold'}}>Status</TableCell>
               <TableCell style={{backgroundColor: '#f2f2f2', fontWeight: 'bold'}}>Started At</TableCell>
               <TableCell style={{backgroundColor: '#f2f2f2', fontWeight: 'bold'}}>Finished At</TableCell>
-              <TableCell style={{
+              <TableCell
+                align='center'
+                colSpan={2}
+                style={{
                 backgroundColor: '#f2f2f2',
                 fontWeight: 'bold',
                 borderLeftColor: 'gray',
                 borderLeftStyle: 'solid'
-              }}></TableCell>
-              <TableCell style={{backgroundColor: '#f2f2f2', fontWeight: 'bold'}}></TableCell>
+              }}>Admin Area</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -167,6 +181,7 @@ const SeasonsPage: React.FC = () => {
                               boxShadow: "0px 0px 10px 1px rgba(0, 0, 0, 0.2)",
                             }
                           }}
+                          onClick={() => handleClick(season.id)}
                 >
                   <TableCell>{season.name}</TableCell>
                   <TableCell>{season.description}</TableCell>
@@ -176,11 +191,11 @@ const SeasonsPage: React.FC = () => {
                   <TableCell>{season.finishedAt ? season.finishedAt : "Not Finished"}</TableCell>
                   <TableCell sx={{borderLeftColor: 'gray', borderLeftStyle: 'solid'}}>
                     <Button variant="contained" color="info"
-                            onClick={() => handleEdit(Number(orgId), season.id)}>Edit</Button>
+                            onClick={(event) => handleEdit(event, Number(orgId), season.id)}>Edit</Button>
                   </TableCell>
                   <TableCell>
                     <Button variant="contained" color="error"
-                            onClick={() => handleDelete(Number(orgId), season.id)}>Delete</Button>
+                            onClick={(event) => handleDelete(event, Number(orgId), season.id)}>Delete</Button>
                   </TableCell>
                 </TableRow>
               ))

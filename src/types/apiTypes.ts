@@ -116,6 +116,25 @@ export type UpdateSeasonRequest = {
 }
 
 
+//Teams
+export type CreateTeamRequest = {
+  name: string;
+  description: string;
+}
+
+export type TeamResponse = {
+  id: number;
+  name: string;
+  description: string;
+}
+
+export type UpdateTeamRequest = {
+  id: number;
+  name: string;
+  description: string;
+}
+
+
 //Games
 export type GameInfoResponse = {
   id: number;

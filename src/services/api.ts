@@ -1,12 +1,21 @@
 import axios from "axios";
 import {
   CreateOrganisationRequest,
-  NewUserRequestBody, OrganisationInfoResponse,
+  NewUserRequestBody,
+  OrganisationInfoResponse,
   SigninRequestBody,
   TokenRequestBody,
-  TokenResponseBody, UpdateOrganisationRequest,
+  TokenResponseBody,
+  UpdateOrganisationRequest,
   UserResponseBody,
-  Page, SeasonInfoResponse, SeasonResponse, CreateSeasonRequest, UpdateSeasonRequest
+  Page,
+  SeasonInfoResponse,
+  SeasonResponse,
+  CreateSeasonRequest,
+  UpdateSeasonRequest,
+  TeamResponse,
+  CreateTeamRequest,
+  UpdateTeamRequest
 } from "../types/apiTypes";
 import CookieService from "./CookieService";
 import TokenRefreshService from "./TokenRefreshService";
@@ -95,6 +104,41 @@ export const updateSeason = async (orgId: number, season: UpdateSeasonRequest) =
 export const deleteSeason = async (orgId: number, seasonId: number) => {
   const response = await api.delete<void>(
     '/organisations/' + orgId + '/seasons/' + seasonId
+  );
+  return response.data;
+};
+
+
+// Teams
+export const getTeams = async (page: number, orgId: number) => {
+  const response = await api.get<Page<TeamResponse>>(
+    '/organisations/' + orgId + '/teams?page=' + page + '&size=' + 3);
+  return response.data;
+};
+export const getTeam = async (orgId: number, teamId: number) => {
+  const response = await api.get<TeamResponse>(
+    '/organisations/' + orgId + '/teams/' + teamId);
+  return response.data;
+};
+export const createTeam = async (orgId: number, team: CreateTeamRequest) => {
+
+  const response = await api.post<TeamResponse>(
+    '/organisations/' + orgId + '/teams',
+    team
+  );
+  return response.data;
+};
+export const updateTeam = async (orgId: number, team: UpdateTeamRequest) => {
+
+  const response = await api.put<TeamResponse>(
+    '/organisations/' + orgId + '/teams/' + team.id,
+    team
+  );
+  return response.data;
+};
+export const deleteTeam = async (orgId: number, teamId: number) => {
+  const response = await api.delete<void>(
+    '/organisations/' + orgId + '/teams/' + teamId
   );
   return response.data;
 };

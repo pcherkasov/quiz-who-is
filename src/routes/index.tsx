@@ -8,8 +8,8 @@ const AuthRoutes = lazy(() => import('./auth/AuthRoutes'));
 const HomePage = lazy(() => import('../pages/HomePage'));
 const OrganisationsPage = lazy(() => import('../pages/OrganisationsPage'));
 const SeasonsPage = lazy(() => import('../pages/SeasonsPage'));
+const TeamsPage = lazy(() => import('../pages/TeamsPage'));
 // const OrganisationPage = lazy(() => import('../pages/OrganisationPage'));
-// const TeamPage = lazy(() => import('../pages/TeamPage'));
 // const GamePage = lazy(() => import('../pages/GamePage'));
 // const RoundPage = lazy(() => import('../pages/RoundPage'));
 
@@ -40,8 +40,10 @@ export default function RoutesIndex() {
         : <Navigate to="/auth/signin" /> },
     { path: '/organisations/:orgId/seasons', element: isAuthenticated
         ? <ProtectedComponent><SeasonsPage /></ProtectedComponent>
-        : <Navigate to="/auth/signin" /> }
-    // { path: '/organisations/:orgId/teams/:teamId', element: isAuthenticated ? <ProtectedComponent><TeamPage /></ProtectedComponent> : /* RedirectToSomePage */ },
+        : <Navigate to="/auth/signin" /> },
+    { path: '/organisations/:orgId/teams', element: isAuthenticated
+        ? <ProtectedComponent><TeamsPage /></ProtectedComponent>
+        : <Navigate to="/auth/signin" /> },
     // { path: '/organisations/:orgId/seasons/:seasonId', element: isAuthenticated ? <ProtectedComponent><SeasonPage /></ProtectedComponent> : /* RedirectToSomePage */ },
     // { path: '/organisations/:orgId/seasons/:seasonId/games/:gameId', element: isAuthenticated ? <ProtectedComponent><GamePage /></ProtectedComponent> : /* RedirectToSomePage */ },
     // { path: '/organisations/:orgId/seasons/:seasonId/games/:gameId/rounds/:roundId', element: isAuthenticated ? <ProtectedComponent><RoundPage /></ProtectedComponent> : /* RedirectToSomePage */ },
