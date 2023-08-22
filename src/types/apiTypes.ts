@@ -32,8 +32,8 @@ export type TokenRequestBody = {
   refreshToken: string;
 };
 
-//  Organisations
 
+//  Organisations
 export type OrganisationInfoResponse = {
   id: number;
   name: string;
@@ -79,4 +79,50 @@ export interface Page<T> {
   },
   "first": boolean,
   "empty": boolean
+}
+
+
+//Seasons
+export type SeasonInfoResponse = {
+  id: number;
+  name: string;
+  description: string;
+  teamsQuantity: number;
+  status: string;
+  startedAt: string;
+  finishedAt: string;
+  gamesQuantity: number
+}
+
+export type SeasonResponse = {
+  id: number;
+  name: string;
+  description: string;
+  status: string;
+  startedAt: string;
+  finishedAt: string;
+  games: GameInfoResponse[];
+}
+
+export type CreateSeasonRequest = {
+  name: string;
+  description: string;
+}
+
+export type UpdateSeasonRequest = {
+  id: number;
+  name: string;
+  description: string;
+}
+
+
+//Games
+export type GameInfoResponse = {
+  id: number;
+  name: string;
+  description: string;
+  teamsQuantity: number;
+  status: string;
+  startedAt: string;
+  finishedAt: string;
 }

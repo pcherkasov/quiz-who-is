@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent } from '@mui/material';
 import CreateOrganisationForm from './CreateOrganisationForm';
 import { CreateOrganisationRequest } from '../../types/apiTypes';
 

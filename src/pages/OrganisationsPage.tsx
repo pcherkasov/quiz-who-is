@@ -47,6 +47,11 @@ const OrganisationPage: React.FC = () => {
     }
   };
 
+  const handleEdit = (id: number) => {
+    setSelectedOrgId(id);
+    setOrgEditOpen(true);
+  };
+
   const orgCreateMutation = useMutation(createOrganisation, {
     onSuccess: () => {
       queryClient.invalidateQueries('organisations');
@@ -66,32 +71,20 @@ const OrganisationPage: React.FC = () => {
     },
   });
 
-  if (orgLoading || selectedOrgLoading) {
-    return <div>Loading...</div>;
-  }
+  const handleCreate = async (data: CreateOrganisationRequest) => {
 
-  if (orgError || selectedOrgError) {
-    return <div>Error occurred</div>;
-  }
-
-  const handleUpdate = async (data: UpdateOrganisationRequest) => {
     try {
-      await orgUpdateMutation.mutateAsync(data);
-      setOrgEditOpen(false);
+      await orgCreateMutation.mutateAsync(data);
+      setOrgCreateOpen(false);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleEdit = (id: number) => {
-    setSelectedOrgId(id);
-    setOrgEditOpen(true);
-  };
-
-  const handleCreate = async (data: CreateOrganisationRequest) => {
+  const handleUpdate = async (data: UpdateOrganisationRequest) => {
     try {
-      await orgCreateMutation.mutateAsync(data);
-      setOrgCreateOpen(false);
+      await orgUpdateMutation.mutateAsync(data);
+      setOrgEditOpen(false);
     } catch (error) {
       console.error(error);
     }
@@ -104,6 +97,14 @@ const OrganisationPage: React.FC = () => {
       console.error(error);
     }
   };
+
+  if (orgLoading || selectedOrgLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (orgError || selectedOrgError) {
+    return <div>Error occurred</div>;
+  }
 
   return (
     <Container sx={{marginTop: '2em'}}>

@@ -6,7 +6,7 @@ import {
   TokenRequestBody,
   TokenResponseBody, UpdateOrganisationRequest,
   UserResponseBody,
-  Page
+  Page, SeasonInfoResponse, SeasonResponse, CreateSeasonRequest, UpdateSeasonRequest
 } from "../types/apiTypes";
 import CookieService from "./CookieService";
 import TokenRefreshService from "./TokenRefreshService";
@@ -31,34 +31,32 @@ export const refreshToken = (token: TokenRequestBody) => {
   return api.post<TokenResponseBody>('/auth/refresh', token);
 };
 
-let isRefreshing = false;
 
 // Organisations
-
 export const getOrganisations = async (page: number) => {
   const response = await api.get<Page<OrganisationInfoResponse>>('/organisations?page=' + page + '&size=' + 3);
   return response.data;
 };
-
 export const getOrganisation = async (id: number | null) => {
+
   if (!id) {
     return;
   }
   const response = await api.get<OrganisationInfoResponse>('/organisations/' + id);
   return response.data;
 };
-
 export const createOrganisation = async (organisation: CreateOrganisationRequest) => {
+
   const response = await api.post<OrganisationInfoResponse>('/organisations', organisation);
   return response.data;
 };
-
 export const updateOrganisation = async (organisation: UpdateOrganisationRequest) => {
+
   const response = await api.put<OrganisationInfoResponse>('/organisations/' + organisation.id, organisation);
   return response.data;
 };
-
 export const deleteOrganisation = async (id: number | null) => {
+
   if (!id) {
     return ;
   }
@@ -67,7 +65,43 @@ export const deleteOrganisation = async (id: number | null) => {
 };
 
 
+// Seasons
+export const getSeasons = async (page: number, orgId: number) => {
+  const response = await api.get<Page<SeasonInfoResponse>>(
+    '/organisations/' + orgId + '/seasons?page=' + page + '&size=' + 3);
+  return response.data;
+};
+export const getSeason = async (orgId: number, seasonId: number) => {
+  const response = await api.get<SeasonResponse>(
+    '/organisations/' + orgId + '/seasons/' + seasonId);
+  return response.data;
+};
+export const createSeason = async (orgId: number, season: CreateSeasonRequest) => {
+
+  const response = await api.post<SeasonInfoResponse>(
+    '/organisations/' + orgId + '/seasons',
+    season
+  );
+  return response.data;
+};
+export const updateSeason = async (orgId: number, season: UpdateSeasonRequest) => {
+
+  const response = await api.put<SeasonInfoResponse>(
+    '/organisations/' + orgId + '/seasons/' + season.id,
+    season
+  );
+  return response.data;
+};
+export const deleteSeason = async (orgId: number, seasonId: number) => {
+  const response = await api.delete<void>(
+    '/organisations/' + orgId + '/seasons/' + seasonId
+  );
+  return response.data;
+};
+
+
 // Interceptors
+let isRefreshing = false;
 api.interceptors.response.use((response) => {
   return response;
 }, async (error) => {
