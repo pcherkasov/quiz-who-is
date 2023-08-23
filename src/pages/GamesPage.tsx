@@ -184,8 +184,12 @@ const GamesPage: React.FC = () => {
                     <Select
                       value={game.status}
                       onChange={(event) => {
+                        event.stopPropagation();
                         const status = event.target.value as string;
                         gameStatusMutation.mutate({id: game.id, status})
+                      }}
+                      onClick={(event) => {
+                        event.stopPropagation();
                       }}
                     >
                       <MenuItem value={"PENDING"}>Pending</MenuItem>

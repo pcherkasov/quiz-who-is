@@ -205,7 +205,28 @@ export const deleteGame = async (orgId: number, seasonId: number, gameId: number
   );
   return response.data;
 };
+export const downloadGameResultsAsExcel = async (orgId: number, seasonId: number, gameId: number) => {
+  const response = await api.get(
+    `/organisations/${orgId}/seasons/${seasonId}/games/${gameId}/export`,
+    { responseType: 'blob' }
+  );
 
+  const disposition = response.headers['content-disposition'];
+  let filename = 'game-results.xlsx';
+  if (disposition) {
+    const filenameMatch = disposition.match(/filename="?([^"]*)/i);
+    if (filenameMatch && filenameMatch.length === 2) {
+      filename = filenameMatch[1];
+    }
+  }
+
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', filename);
+  document.body.appendChild(link);
+  link.click();
+};
 
 //=======================---Interceptors---=======================
 let isRefreshing = false;

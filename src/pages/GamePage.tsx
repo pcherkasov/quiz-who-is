@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
-import { getGame } from "../services/api";
+import {downloadGameResultsAsExcel, getGame} from "../services/api";
 import { GameResultsResponse } from "../types/apiTypes";
 import {
   Table,
@@ -10,7 +10,7 @@ import {
   TableHead,
   TableRow,
   Typography,
-  Paper
+  Paper, Button
 } from "@mui/material";
 
 const GamePage: React.FC = () => {
@@ -27,6 +27,9 @@ const GamePage: React.FC = () => {
 
   return (
     <div>
+      <Button variant="contained" color="primary" onClick={() => downloadGameResultsAsExcel(Number(orgId), Number(seasonId), Number(gameId))}>
+        Download Results as Excel
+      </Button>
       <Typography variant="h2" gutterBottom>{game.name}</Typography>
       <Typography variant="subtitle1" gutterBottom>{game.description}</Typography>
       <TableContainer component={Paper}>

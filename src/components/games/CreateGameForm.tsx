@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {useForm} from "react-hook-form";
-import {Autocomplete, Button, Grid, Stack, TextField} from "@mui/material";
+import {Controller, useForm} from "react-hook-form";
+import { Button, Chip, Grid, Stack, TextField} from "@mui/material";
 import {TeamResponse} from "../../types/apiTypes";
 import {getTeams} from "../../services/api";
 
@@ -19,18 +19,27 @@ interface FormData {
 }
 
 const CreateGameForm: React.FC<CreateGameFormProps> = ({orgId, seasonId, onSubmit, onClose}) => {
-  const {register, handleSubmit, setValue} = useForm<FormData>();
+  const {register, handleSubmit, control} = useForm<FormData>();
   const [teams, setTeams] = useState<TeamResponse[]>([]);
+  const [selectedTeams, setSelectedTeams] = useState<number[]>([]);
   useEffect(() => {
-    getTeams(0, 1000, orgId) // Получаем команды, здесь 1 - это номер страницы, если у вас больше команд, вам понадобится нечто более сложное для пагинации
-      .then(data => setTeams(data.content)) // сохраняем полученные команды в состоянии
-      .catch(error => console.error(error)); // обрабатываем возможные ошибки
+    getTeams(0, 1000, orgId)
+      .then(data => setTeams(data.content))
+      .catch(error => console.error(error));
   }, [orgId]);
-  const handleTeamsChange = (_: any, value: any[]) => {
-    setValue('teamIds', value.map(team => team.id)); // сохраняем ID выбранных команд в "teamIds"
+
+  const handleTeamClick = (teamId: number) => {
+    if (!selectedTeams.includes(teamId)) {
+      setSelectedTeams([...selectedTeams, teamId]);
+    } else {
+      setSelectedTeams(selectedTeams.filter(id => id !== teamId));
+    }
   };
   return (
-    <form onSubmit={handleSubmit(data => onSubmit(orgId, seasonId, data))}>
+    <form onSubmit={handleSubmit(data => {
+      data.teamIds = selectedTeams;
+      onSubmit(orgId, seasonId, data);
+    })}>
       <Grid container spacing={2} direction="column">
         <Grid item>
           <TextField
@@ -68,17 +77,22 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({orgId, seasonId, onSubmi
           />
         </Grid>
         <Grid item>
-          <Autocomplete
-            multiple
-            id="teams"
-            options={teams}
-            getOptionLabel={(option) => option.name}
-            onChange={handleTeamsChange}
-            renderInput={(params) => (
-              <TextField {...params} variant="outlined" label="Teams" placeholder="Teams"/>
-            )}
-          />
+          {teams.map(team => (
+            <Chip
+              label={team.name}
+              clickable
+              color={selectedTeams.includes(team.id) ? "primary" : "default"}
+              onClick={() => handleTeamClick(team.id)}
+              style={{ margin: 4 }}
+            />
+          ))}
         </Grid>
+        <Controller
+          control={control}
+          name="teamIds"
+          defaultValue={selectedTeams}
+          render={({ field }) => <></>}
+        />
         <Stack direction="row" justifyContent="left" spacing={2} marginTop='2em'>
           <Button variant="contained" color="primary" type="submit">
             Save
