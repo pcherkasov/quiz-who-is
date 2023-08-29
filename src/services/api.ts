@@ -29,7 +29,7 @@ import CookieService from "./CookieService";
 import TokenRefreshService from "./TokenRefreshService";
 
 const api = axios.create({
-  baseURL: getEnv('REACT_APP_BASE_URL', 'http://213.188.223.117:80/api/v1'),
+  baseURL: getEnv('REACT_APP_BASE_URL', 'http://localhost:8080/api/v1'),
 });
 
 function getEnv(varName: string, defaultValue: string): string {
