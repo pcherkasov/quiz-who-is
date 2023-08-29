@@ -3,7 +3,8 @@ import {useMutation, useQuery, useQueryClient} from "react-query";
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import {createRound, downloadGameResultsAsExcel, getGame} from "../services/api";
+import DownloadIcon from '@mui/icons-material/Download';
+import {createRound, deleteRound, downloadGameResultsAsExcel, getGame} from "../services/api";
 import {CreateRoundRequest, GameResultsResponse} from "../types/apiTypes";
 import {
   Button,
@@ -23,10 +24,19 @@ import CreateRoundDialog from "../components/rounds/CreateRoundDialog";
 
 const GamePage: React.FC = () => {
   const queryClient = useQueryClient();
-  const {gameId, orgId, seasonId}
-    = useParams<{ gameId: string, orgId: string, seasonId: string }>();
-  const [hoveredColumnIndex, setHoveredColumnIndex]
-    = useState<number | null>(null);
+
+  const {
+    gameId,
+    orgId,
+    seasonId
+  }
+    = useParams<{
+    gameId: string,
+    orgId: string,
+    seasonId: string
+  }>();
+
+  const [hoveredColumnIndex, setHoveredColumnIndex] = useState<number | null>(null);
   const [roundCreateOpen, setRoundCreateOpen] = useState(false);
 
   const {data: game, isLoading, isError}
@@ -47,10 +57,36 @@ const GamePage: React.FC = () => {
       },
     });
 
+  const roundDeleteMutation = useMutation(
+    ({orgId, seasonId, gameId, roundId}: {
+      orgId: number,
+      seasonId: number,
+      gameId: number,
+      roundId: number
+    }) => deleteRound(orgId, seasonId, gameId, roundId), {
+      onSuccess: () => {
+        queryClient.invalidateQueries('game');
+      }
+    }
+  );
+
   const handleCreateRound = async (orgId: number, seasonId: number, gameId: number, data: CreateRoundRequest) => {
     try {
       await roundCreateMutation.mutateAsync({orgId, seasonId, gameId, data});
       setRoundCreateOpen(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDeleteRound = async (
+    orgId: number,
+    seasonId: number,
+    gameId: number,
+    roundId: number
+  ) => {
+    try {
+      await roundDeleteMutation.mutateAsync({orgId, seasonId, gameId, roundId});
     } catch (error) {
       console.error(error);
     }
@@ -72,11 +108,12 @@ const GamePage: React.FC = () => {
         && game.teams[0].roundResults
         && Object.keys(game.teams[0].roundResults).length > 0
         && <Button
+              startIcon={<DownloadIcon/>}
               variant="contained"
               color="primary"
               onClick={() => downloadGameResultsAsExcel(Number(orgId), Number(seasonId), Number(gameId))}
           >
-              Download Results as Excel
+              Export to Excel
           </Button>}
       <Typography variant="h2" gutterBottom>{game.name}</Typography>
       <Grid container spacing={0} direction="row">
@@ -85,6 +122,7 @@ const GamePage: React.FC = () => {
         </Grid>
         <Grid item xs={2}>
           <Button
+            startIcon={<AddIcon/>}
             color="secondary"
             variant="contained"
             onClick={(event) => {
@@ -92,7 +130,6 @@ const GamePage: React.FC = () => {
               setRoundCreateOpen(true);
             }}
           >
-            <AddIcon/>
             Add new Round
           </Button>
         </Grid>
@@ -145,6 +182,7 @@ const GamePage: React.FC = () => {
                             component="span"
                             onClick={(event) => {
                               event.stopPropagation();
+                              handleDeleteRound(Number(orgId), Number(seasonId), Number(gameId), round.roundId);
                             }}
                           >
                             <DeleteForeverIcon/>

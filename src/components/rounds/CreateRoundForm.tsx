@@ -1,4 +1,4 @@
-import {TextField, Button, Grid, Select, MenuItem} from '@mui/material';
+import {TextField, Button, Grid, Select, MenuItem, Stack} from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { CreateRoundRequest } from '../../types/apiTypes';
 import React, {useState} from "react";
@@ -12,7 +12,16 @@ interface CreateRoundFormProps {
 }
 
 const CreateRoundForm: React.FC<CreateRoundFormProps> = ({ orgId, seasonId, gameId, onSubmit, onClose }) => {
-  const { register, handleSubmit, setValue, getValues} = useForm<CreateRoundRequest>();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    control,
+    getValues} = useForm<CreateRoundRequest>({
+    defaultValues: {
+      type: "CLASSIC"
+    }
+  });
   const [questionsNumber, setQuestionsNumber] = useState<number>(0);
   const [type, setType] = useState<string>("CLASSIC");
   const changeQuestionNumber = (newNumber: number) => {
@@ -48,9 +57,15 @@ const CreateRoundForm: React.FC<CreateRoundFormProps> = ({ orgId, seasonId, game
           />
         </Grid>
         <Grid item>
+          <Controller
+            name="type"
+            control={control}
+            render={({ field }) => (
           <Select
             fullWidth={true}
-            value={type}
+            defaultValue={"CLASSIC"}
+            defaultChecked={true}
+            value={field.value}
             onChange={(event) => {
               event.stopPropagation();
               const newType = event.target.value as string;
@@ -63,6 +78,8 @@ const CreateRoundForm: React.FC<CreateRoundFormProps> = ({ orgId, seasonId, game
             <MenuItem value={"CLASSIC"}>Classic</MenuItem>
             <MenuItem value={"BLITZ"}>Blitz</MenuItem>
           </Select>
+            )}
+          />
         </Grid>
         <Grid item>
           <TextField
@@ -77,12 +94,14 @@ const CreateRoundForm: React.FC<CreateRoundFormProps> = ({ orgId, seasonId, game
           />
         </Grid>
         <Grid item>
+          <Stack direction="row" justifyContent="left" spacing={2} marginTop='2em'>
           <Button variant="contained" color="primary" type="submit">
             Save
           </Button>
           <Button variant="contained" color="secondary" onClick={onClose}>
             Cancel
           </Button>
+          </Stack>
         </Grid>
       </Grid>
     </form>
