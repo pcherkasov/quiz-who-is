@@ -1,14 +1,16 @@
 import axios from "axios";
 import {
+  AddQuestionRequest, AddTeamAnswerRequest, AnswerInfoResponse,
   CreateGameRequest,
   CreateOrganisationRequest,
+  CreateRoundRequest,
   CreateSeasonRequest,
   CreateTeamRequest,
   GameResponse,
   GameResultsResponse,
-  NewUserRequestBody,
+  NewUserRequestBody, OneRoundResponse,
   OrganisationInfoResponse,
-  Page,
+  Page, QuestionInfoResponse, RoundResponse,
   SeasonInfoResponse,
   SeasonResponse,
   SigninRequestBody,
@@ -17,9 +19,9 @@ import {
   TokenResponseBody,
   UpdateGameInfoRequest,
   UpdateGameStatusRequest,
-  UpdateOrganisationRequest,
+  UpdateOrganisationRequest, UpdateQuestionTypeRequest, UpdateRoundInfoRequest,
   UpdateSeasonRequest,
-  UpdateSeasonStatusRequest,
+  UpdateSeasonStatusRequest, UpdateTeamAnswerRequest,
   UpdateTeamRequest,
   UserResponseBody
 } from "../types/apiTypes";
@@ -37,7 +39,7 @@ function getEnv(varName: string, defaultValue: string): string {
 
 //=======================---Auth---=======================
 export const signup = (user: NewUserRequestBody) => {
-  return api.post<UserResponseBody>('/auth/signup?lang=ru', user);
+  return api.post<UserResponseBody>('/auth/signup', user);
 };
 
 export const signin = (user: SigninRequestBody) => {
@@ -176,7 +178,6 @@ export const getGame = async (orgId: number, seasonId: number, gameId: number) =
   return response.data;
 };
 export const createGame = async (orgId: number, seasonId: number, game: CreateGameRequest) => {
-
   const response = await api.post<GameResponse>(
     `/organisations/${orgId}/seasons/${seasonId}/games`,
     game
@@ -184,7 +185,6 @@ export const createGame = async (orgId: number, seasonId: number, game: CreateGa
   return response.data;
 };
 export const updateGame = async (orgId: number, seasonId: number, game: UpdateGameInfoRequest) => {
-
   const response = await api.put<GameResponse>(
     `/organisations/${orgId}/seasons/${seasonId}/games/${game.id}`,
     game
@@ -206,12 +206,13 @@ export const deleteGame = async (orgId: number, seasonId: number, gameId: number
   return response.data;
 };
 export const downloadGameResultsAsExcel = async (orgId: number, seasonId: number, gameId: number) => {
-  const response = await api.get(
+  await api.get(
     `/organisations/${orgId}/seasons/${seasonId}/games/${gameId}/export`,
     { responseType: 'blob' }
-  );
-
+  ).then( response => {
   const disposition = response.headers['content-disposition'];
+
+
   let filename = 'game-results.xlsx';
   if (disposition) {
     const filenameMatch = disposition.match(/filename="?([^"]*)/i);
@@ -226,7 +227,86 @@ export const downloadGameResultsAsExcel = async (orgId: number, seasonId: number
   link.setAttribute('download', filename);
   document.body.appendChild(link);
   link.click();
+  }).catch(() => {
+    console.log("Error during excel creation");
+  });
 };
+
+
+//======================---Rounds---=======================
+export const createRound = async (orgId: number, seasonId: number, gameId: number, round: CreateRoundRequest) => {
+
+  const response = await api.post<RoundResponse>(
+    `/organisations/${orgId}/seasons/${seasonId}/games/${gameId}/rounds`,
+    round
+  );
+  return response.data;
+};
+export const updateRound = async (orgId: number, seasonId: number, gameId: number, round: UpdateRoundInfoRequest) => {
+
+  const response = await api.post<RoundResponse>(
+    `/organisations/${orgId}/seasons/${seasonId}/games/${gameId}/rounds/${round.id}`,
+    round
+  );
+  return response.data;
+};
+export const getRound = async (orgId: number, seasonId: number, gameId: number, roundId: number) => {
+  const response = await api.get<OneRoundResponse>(
+    `/organisations/${orgId}/seasons/${seasonId}/games/${gameId}/rounds/${roundId}`);
+  return response.data;
+};
+export const deleteRound = async (orgId: number, seasonId: number, gameId: number, roundId: number) => {
+  await api.delete<void>(
+    `/organisations/${orgId}/seasons/${seasonId}/games/${gameId}/rounds/${roundId}`
+  );
+};
+
+
+//======================---Questions---=======================
+export const createQuestion = async (orgId: number, seasonId: number, gameId: number, roundId: number, question: AddQuestionRequest) => {
+  const response = await api.post<QuestionInfoResponse>(
+    `/organisations/${orgId}/seasons/${seasonId}/games/${gameId}/rounds/${roundId}/questions`,
+    question
+  );
+  return response.data;
+};
+export const updateQuestion = async (orgId: number, seasonId: number, gameId: number, roundId: number, question: UpdateQuestionTypeRequest) => {
+
+  const response = await api.post<QuestionInfoResponse>(
+    `/organisations/${orgId}/seasons/${seasonId}/games/${gameId}/rounds/${roundId}/questions/${question.id}`,
+    question
+  );
+  return response.data;
+};
+export const deleteQuestion = async (orgId: number, seasonId: number, gameId: number, roundId: number, questionId: number) => {
+  await api.delete<void>(
+    `/organisations/${orgId}/seasons/${seasonId}/games/${gameId}/rounds/${roundId}/questions/${questionId}`
+  );
+};
+
+
+//======================---Answers---=======================
+export const createAnswer = async (orgId: number, seasonId: number, gameId: number, roundId: number, teamId: number, questionId: number, answer: AddTeamAnswerRequest) => {
+  const response = await api.post<AnswerInfoResponse>(
+    `/organisations/${orgId}/seasons/${seasonId}/games/${gameId}/rounds/${roundId}/teams/${teamId}/questions/${questionId}/answers`,
+    answer
+  );
+  return response.data;
+};
+export const updateAnswer = async (orgId: number, seasonId: number, gameId: number, roundId: number, teamId: number, questionId: number, answer: UpdateTeamAnswerRequest) => {
+  const response = await api.post<AnswerInfoResponse>(
+    `/organisations/${orgId}/seasons/${seasonId}/games/${gameId}/rounds/${roundId}/teams/${teamId}/questions/${questionId}/answers/${answer.id}`,
+    answer
+  );
+  return response.data;
+};
+export const deleteAnswer = async (orgId: number, seasonId: number, gameId: number, roundId: number, teamId: number, questionId: number, answerId: number) => {
+  await api.delete<void>(
+    `/organisations/${orgId}/seasons/${seasonId}/games/${gameId}/rounds/${roundId}/teams/${teamId}/questions/${questionId}/answers/${answerId}`
+  );
+};
+
+
 
 //=======================---Interceptors---=======================
 let isRefreshing = false;

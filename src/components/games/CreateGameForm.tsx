@@ -66,17 +66,6 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({orgId, seasonId, onSubmi
           />
         </Grid>
         <Grid item>
-          <TextField
-            {...register('roundsNumber')}
-            id="roundsNumber"
-            variant="outlined"
-            label="Rounds Number"
-            multiline
-            size="medium"
-            fullWidth={true}
-          />
-        </Grid>
-        <Grid item>
           {teams.map(team => (
             <Chip
               label={team.name}

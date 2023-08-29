@@ -144,7 +144,6 @@ export type UpdateTeamRequest = {
 export type CreateGameRequest = {
   name: string;
   description: string;
-  roundsNumber: number;
   gameIds: number[];
 }
 
@@ -199,14 +198,75 @@ export type GameResultsResponse = {
   id: number;
   name: string;
   description: string;
+  roundsInfo: {[key: string]: RoundResponse};
   teams: TeamGameResultResponse[];
 }
+
+
+//Rounds
+export type CreateRoundRequest = {
+  name: string;
+  description: string;
+  type: string; // Can be "CLASSIC" or "BLITZ"
+  questionsNumber: number;
+}
+export type UpdateRoundInfoRequest = {
+  id: number;
+  name: string;
+  description: string;
+  roundType: string; // Can be "CLASSIC" or "BLITZ"
+}
+export type RoundResponse = {
+  id: number;
+  name: string;
+  roundType: string; // Can be "CLASSIC" or "BLITZ"
+  description?: string;
+  questions: QuestionInfoResponse[];
+}
+export type OneRoundResponse = {
+  id: number;
+  name: string;
+  description: string;
+  roundType: string; // Can be "CLASSIC" or "BLITZ"
+  teams: { [key: string]: TeamRoundResultResponse };
+}
+
+
+//Questions
+export type AddQuestionRequest = {
+  isBomb: boolean;
+  index: number;
+}
+export type QuestionInfoResponse = {
+  id: number;
+  isBomb: boolean;
+  index: number;
+}
+export type UpdateQuestionTypeRequest = {
+  id: number;
+  isBomb: boolean;
+}
+
 
 //Answers
 export type AnswerInfoResponse = {
   id: number;
   questionId: number;
-  answerType: string;
+  answerType: string; // Can be: "EMPTY", "WRONG", "CORRECT"
   cost: number;
   isBomb: boolean;
+}
+export type TeamAnswerResponse = {
+  id: number;
+  type: string; // Can be: "EMPTY", "WRONG", "CORRECT"
+  questionId: number;
+  teamId: number;
+}
+
+export type AddTeamAnswerRequest = {
+  type: string; // Can be: "EMPTY", "WRONG", "CORRECT"
+}
+export type UpdateTeamAnswerRequest = {
+  id: number;
+  type: string; // Can be: "EMPTY", "WRONG", "CORRECT"
 }

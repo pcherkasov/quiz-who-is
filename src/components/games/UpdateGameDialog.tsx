@@ -31,18 +31,20 @@ const UpdateGameDialog: React.FC<UpdateGameDialogProps> = ({
   return (
     <Grid container direction="column" spacing={3}>
       <Dialog open={open} onClose={onClose}>
-        <Grid item>
-        <DialogTitle>Edit Game</DialogTitle>
-        </Grid>
-        <Grid item>
-        <DialogContent>
-          <UpdateGameForm
-            orgId={orgId}
-            seasonId={seasonId}
-            game={game}
-            onSubmit={handleUpdate}
-            onClose={onClose}/>
-        </DialogContent>
+        <Grid container direction="column" spacing={3}>
+          <Grid item>
+            <DialogTitle>Edit Game</DialogTitle>
+          </Grid>
+          <Grid item>
+            <DialogContent>
+              <UpdateGameForm
+                orgId={orgId}
+                seasonId={seasonId}
+                game={game}
+                onSubmit={handleUpdate}
+                onClose={onClose}/>
+            </DialogContent>
+          </Grid>
         </Grid>
       </Dialog>
     </Grid>

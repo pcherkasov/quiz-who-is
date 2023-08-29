@@ -23,10 +23,7 @@ const GamesPage: React.FC = () => {
   const {orgId} = useParams<{ orgId: string }>();
   const {seasonId} = useParams<{ seasonId: string }>();
   const [currentPage, setCurrentPage] = useState(0);
-  const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
   const [selectedGame, setSelectedGame] = useState<GameResponse | null>(null);
-  const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
-  const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
   const [gameEditOpen, setGameEditOpen] = useState(false);
   const [gameCreateOpen, setGameCreateOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -78,7 +75,6 @@ const GamesPage: React.FC = () => {
       gameId: number
     }) => deleteGame(orgId, seasonId, gameId), {
       onSuccess: () => {
-        setSelectedGameId(null);
         queryClient.invalidateQueries('games');
       },
     });
@@ -94,10 +90,7 @@ const GamesPage: React.FC = () => {
 
   const handleEdit = (event: React.MouseEvent<HTMLButtonElement>, orgId: number, seasonId: number, gameId: number, game: GameResponse) => {
     event.stopPropagation();
-    setSelectedGameId(gameId);
     setSelectedGame(game);
-    setSelectedSeasonId(seasonId);
-    setSelectedOrgId(orgId);
     setGameEditOpen(true);
   };
 

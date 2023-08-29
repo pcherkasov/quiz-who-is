@@ -14,9 +14,10 @@ pipelines:
 #            - docker push charkasau/quizyeasy-ui
 #          services:
 #            - docker
-#      - step:
-#          name: deploy
-#          script:
+      - step:
+          name: deploy
+          script:
+             - echo 'Hi'
 #            - apk update; apk add curl
 #            - curl -L https://fly.io/install.sh | sh
 #            - export FLYCTL_INSTALL="/root/.fly"
