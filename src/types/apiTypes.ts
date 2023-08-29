@@ -219,7 +219,7 @@ export type UpdateRoundInfoRequest = {
 export type RoundResponse = {
   id: number;
   name: string;
-  roundType: string; // Can be "CLASSIC" or "BLITZ"
+  type: string; // Can be "CLASSIC" or "BLITZ"
   description?: string;
   questions: QuestionInfoResponse[];
 }

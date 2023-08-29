@@ -3,6 +3,7 @@ import {useMutation, useQuery, useQueryClient} from "react-query";
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import BoltIcon from '@mui/icons-material/Bolt';
 import DownloadIcon from '@mui/icons-material/Download';
 import {createRound, deleteRound, downloadGameResultsAsExcel, getGame} from "../services/api";
 import {CreateRoundRequest, GameResultsResponse} from "../types/apiTypes";
@@ -162,6 +163,7 @@ const GamePage: React.FC = () => {
                       <Grid container spacing={0} direction="row" alignItems="center">
                         <Grid item xs={8}>
                           {round.roundName}
+                          {game.roundsInfo[round.roundName].type === "BLITZ" && <BoltIcon fontSize={"small"}/>}
                         </Grid>
                         <Grid item xs={2}>
                           <IconButton
@@ -212,6 +214,7 @@ const GamePage: React.FC = () => {
                   <TableCell>{team.teamName}</TableCell>
                   {Object.values(team.roundResults).map((result) => (
                     <TableCell
+                      align={"center"}
                       key={result.roundId}
                       onMouseEnter={() => setHoveredColumnIndex(result.roundId)}
                       onMouseLeave={() => setHoveredColumnIndex(null)}

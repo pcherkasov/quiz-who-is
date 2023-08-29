@@ -16,10 +16,11 @@ const CreateRoundForm: React.FC<CreateRoundFormProps> = ({ orgId, seasonId, game
     register,
     handleSubmit,
     setValue,
-    control,
-    getValues} = useForm<CreateRoundRequest>({
+    control
+  } = useForm<CreateRoundRequest>({
     defaultValues: {
-      type: "CLASSIC"
+      type: "CLASSIC",
+      questionsNumber: 7
     }
   });
   const [questionsNumber, setQuestionsNumber] = useState<number>(0);
